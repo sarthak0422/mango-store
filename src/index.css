@@ -1,0 +1,56 @@
+@import "tailwindcss";
+
+@theme {
+  /* Branding Colors */
+  --color-mango: #ffb100;
+  --color-mango-dark: #e89b00;
+  --color-leaf: #2e7d32;
+  --color-cream: #fff8e6;
+  --color-dark: #1f1f1f;
+
+  /* Custom Utilities */
+  --shadow-soft: 0 10px 30px rgba(0, 0, 0, 0.08);
+  
+  /* Animations */
+  --animate-fade-in: fadeIn 0.4s ease-in-out;
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+}
+
+@layer base {
+  body {
+    @apply font-sans bg-[#fafafa] text-dark antialiased;
+    scroll-behavior: smooth;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply px-6 py-3 rounded-xl font-semibold transition-all duration-300 
+           bg-mango text-white hover:bg-mango-dark hover:shadow-lg active:scale-95;
+  }
+
+  .btn-outline {
+    @apply px-6 py-3 rounded-xl font-semibold border-2 transition-all duration-300
+           border-mango text-mango hover:bg-mango hover:text-white active:scale-95;
+  }
+
+  .card {
+    @apply rounded-2xl p-6 bg-white transition-all duration-300 
+           shadow-soft hover:-translate-y-2 hover:shadow-xl;
+  }
+
+  .tag {
+    @apply inline-block px-3 py-1 rounded-full text-sm font-medium 
+           bg-leaf/10 text-leaf mb-4;
+  }
+}
