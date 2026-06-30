@@ -285,10 +285,12 @@ export default function Orders() {
       )}
       {/* 🧾 INJECT DETAILS MODAL GATE */}
       {selectedOrder && (
+        <div className="relative z-50">
         <OrderDetailsModal
           order={selectedOrder}
           onClose={() => setSelectedOrder(null)}
         />
+        </div>
       )}
     </div>
   );

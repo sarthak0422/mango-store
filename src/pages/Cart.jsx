@@ -62,6 +62,7 @@ export default function Cart() {
 
       if (querySnapshot.empty) {
         toast.error("Invalid coupon code.");
+        setVerifyingCoupon(false);
         return;
       }
 
@@ -69,6 +70,7 @@ export default function Cart() {
 
       if (!couponDoc.isActive) {
         toast.error("This coupon code has expired or is disabled.");
+        setVerifyingCoupon(false);
         return;
       }
 
