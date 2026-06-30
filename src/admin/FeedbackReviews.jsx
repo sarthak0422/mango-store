@@ -10,7 +10,7 @@ export default function FeedbackReviews() {
 
   const fetchReviews = async () => {
     try {
-      const snap = await getDocs(collection(db, "feedback"));
+      const snap = await getDocs(collection(db, "reviews"));
       const list = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
       list.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
       setReviews(list);
@@ -26,8 +26,8 @@ export default function FeedbackReviews() {
   const handleDelete = async (id) => {
     if (!window.confirm("Are you sure you want to drop this public review record?")) return;
     try {
-      await deleteDoc(doc(db, "feedback", id));
-      toast.success("Feedback post moderated successfully.");
+      await deleteDoc(doc(db, "reviews", id));
+      toast.success("Review post moderated successfully.");
       setReviews(prev => prev.filter(r => r.id !== id));
     } catch {
       toast.error("Moderation request rejected by database validation gates.");

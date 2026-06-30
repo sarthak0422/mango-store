@@ -10,12 +10,14 @@ import {
 } from "firebase/firestore";
 import { toast } from "react-hot-toast";
 import { formatPrice } from "../utils/formatPrice";
-import { RefreshCw, ShieldCheck, Truck } from "lucide-react";
+import { RefreshCw, ShieldCheck, Truck, Eye } from "lucide-react";
+import OrderDetailsModal from "../components/OrderDetailsModal";
 
 export default function Orders() {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [fulfillmentFilter, setFulfillmentFilter] = useState("All");
+  const [selectedOrder, setSelectedOrder] = useState(null);
 
   useEffect(() => {
     setLoading(true);
@@ -36,7 +38,7 @@ export default function Orders() {
         console.error("Live sync error:", error);
         toast.error("Logistics synchronization interrupted.");
         setLoading(false);
-      }
+      },
     );
 
     return () => unsubscribe();
@@ -87,7 +89,9 @@ export default function Orders() {
 
   const filteredOrders = orders.filter((o) => {
     const currentFulfillment = getFulfillmentStatus(o);
-    return fulfillmentFilter === "All" || currentFulfillment === fulfillmentFilter;
+    return (
+      fulfillmentFilter === "All" || currentFulfillment === fulfillmentFilter
+    );
   });
 
   return (
@@ -99,7 +103,8 @@ export default function Orders() {
             Logistics Fulfillment Dashboard
           </h1>
           <p className="text-sm text-gray-500 mt-1 font-medium">
-            Coordinate customer packaging boxes, track shipments, and audit transaction clearing statuses in real-time.
+            Coordinate customer packaging boxes, track shipments, and audit
+            transaction clearing statuses in real-time.
           </p>
         </div>
 
@@ -114,23 +119,26 @@ export default function Orders() {
 
       {/* Fulfillment Status Sorting Row Control Tabs */}
       <div className="flex flex-wrap gap-2 bg-[#3c1d00] p-1.5 rounded-xl border w-fit shadow-xs border-gray-100">
-        {["All", "Pending", "Processing", "Shipped", "Delivered"].map((status) => (
-          <button
-            key={status}
-            onClick={() => setFulfillmentFilter(status)}
-            className={`px-4 py-2 text-xs font-bold rounded-lg transition-all cursor-pointer ${
-              fulfillmentFilter === status
-                ? "bg-white text-brown shadow-xs"
-                : "text-orange-100/70 hover:text-white"
-            }`}
-          >
-            {status} ({
-              status === "All"
+        {["All", "Pending", "Processing", "Shipped", "Delivered"].map(
+          (status) => (
+            <button
+              key={status}
+              onClick={() => setFulfillmentFilter(status)}
+              className={`px-4 py-2 text-xs font-bold rounded-lg transition-all cursor-pointer ${
+                fulfillmentFilter === status
+                  ? "bg-white text-brown shadow-xs"
+                  : "text-orange-100/70 hover:text-white"
+              }`}
+            >
+              {status} (
+              {status === "All"
                 ? orders.length
-                : orders.filter((o) => getFulfillmentStatus(o) === status).length
-            })
-          </button>
-        ))}
+                : orders.filter((o) => getFulfillmentStatus(o) === status)
+                    .length}
+              )
+            </button>
+          ),
+        )}
       </div>
 
       {/* Orders Operational Data Table View Grid */}
@@ -149,11 +157,16 @@ export default function Orders() {
               <thead>
                 <tr className="bg-gray-50 border-b text-xs font-bold uppercase text-gray-500 tracking-wider">
                   <th className="p-4 pl-6">Order ID</th>
+                  <th className="p-4 pr-6 text-center">Receipt</th>
                   <th className="p-4">Customer</th>
                   <th className="p-4">Items Summary</th>
                   <th className="p-4">Gross Due</th>
-                  <th className="p-4 flex items-center gap-1"><ShieldCheck size={14}/> Payment Status</th>
-                  <th className="p-4"><Truck size={14}/> Delivery Phase</th>
+                  <th className="p-4 flex items-center gap-1">
+                    <ShieldCheck size={14} /> Payment Status
+                  </th>
+                  <th className="p-4">
+                    <Truck size={14} /> Delivery Phase
+                  </th>
                   <th className="p-4 pr-6 text-right">Logistics Actions</th>
                 </tr>
               </thead>
@@ -164,52 +177,83 @@ export default function Orders() {
                   const fulfillmentState = getFulfillmentStatus(order);
 
                   return (
-                    <tr key={order.id} className="hover:bg-gray-50/30 transition-colors">
+                    <tr
+                      key={order.id}
+                      className="hover:bg-gray-50/30 transition-colors"
+                    >
+                      {/* Order ID Column */}
                       <td className="p-4 pl-6 font-bold text-brown font-mono text-xs uppercase">
                         {order.id.substring(0, 8)}...
                       </td>
 
+                      {/* VIEW INVOICE MODAL TRIGGER */}
+                      <td className="p-4 text-center">
+                        <button
+                          onClick={() => setSelectedOrder(order)}
+                          className="inline-flex items-center gap-2 bg-blue-500 hover:bg-blue-600 text-white px-3 py-2 rounded-xl text-xs font-bold transition"
+                        >
+                          <Eye size={14} />
+                          View
+                        </button>
+                      </td>
+
+                      {/* Customer Email Column */}
                       <td className="p-4 text-gray-500 font-medium">
-                        <p className="text-gray-900">{order.customerEmail || "Guest Shopper"}</p>
+                        <p className="text-gray-900">
+                          {order.customerEmail || "Guest Shopper"}
+                        </p>
                         {order.razorpayPaymentId && (
-                          <span className="text-[10px] block text-stone-400 font-mono tracking-tight mt-0.5">ID: {order.razorpayPaymentId}</span>
+                          <span className="text-[10px] block text-stone-400 font-mono tracking-tight mt-0.5">
+                            ID: {order.razorpayPaymentId}
+                          </span>
                         )}
                       </td>
 
+                      {/* Items Summary Column */}
                       <td className="p-4 max-w-xs">
                         <div className="space-y-0.5 text-xs">
                           {order.items?.map((item, i) => (
                             <p key={i} className="text-gray-600 font-semibold">
                               {item.title}{" "}
-                              <span className="text-mango font-bold">x{item.qty}</span>
+                              <span className="text-mango font-bold">
+                                x{item.qty}
+                              </span>
                             </p>
                           ))}
                         </div>
                       </td>
 
+                      {/* Gross Due Column */}
                       <td className="p-4 text-base font-extrabold text-stone-900">
                         {formatPrice(order.grandTotal)}
                       </td>
 
                       {/* PAYMENT STATUS BADGE MODULE */}
                       <td className="p-4">
-                        <span className={`px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider ${
-                          paymentState === "Paid"
-                            ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
-                            : "bg-rose-50 text-rose-600 border border-rose-100"
-                        }`}>
+                        <span
+                          className={`px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider ${
+                            paymentState === "Paid"
+                              ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
+                              : "bg-rose-50 text-rose-600 border border-rose-100"
+                          }`}
+                        >
                           {paymentState}
                         </span>
                       </td>
 
                       {/* DELIVERY PHASE BADGE MODULE */}
                       <td className="p-4">
-                        <span className={`px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider ${
-                          fulfillmentState === "Delivered" ? "bg-green-600 text-white shadow-xs" :
-                          fulfillmentState === "Shipped" ? "bg-blue-500 text-white shadow-xs" :
-                          fulfillmentState === "Processing" ? "bg-amber-50 text-amber-700 border border-amber-200" :
-                          "bg-stone-100 text-stone-500 border border-stone-200"
-                        }`}>
+                        <span
+                          className={`px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider ${
+                            fulfillmentState === "Delivered"
+                              ? "bg-green-600 text-white shadow-xs"
+                              : fulfillmentState === "Shipped"
+                                ? "bg-blue-500 text-white shadow-xs"
+                                : fulfillmentState === "Processing"
+                                  ? "bg-amber-50 text-amber-700 border border-amber-200"
+                                  : "bg-stone-100 text-stone-500 border border-stone-200"
+                          }`}
+                        >
                           {fulfillmentState}
                         </span>
                       </td>
@@ -218,11 +262,15 @@ export default function Orders() {
                       <td className="p-4 pr-6 text-right">
                         <select
                           value={fulfillmentState}
-                          onChange={(e) => handleUpdateFulfillment(order.id, e.target.value)}
+                          onChange={(e) =>
+                            handleUpdateFulfillment(order.id, e.target.value)
+                          }
                           className="bg-white border border-stone-200 rounded-xl text-xs px-3 py-2 outline-none focus:border-mango font-bold text-brown cursor-pointer shadow-xs"
                         >
                           <option value="Pending">🕒 Set to Pending</option>
-                          <option value="Processing">📦 Set to Processing</option>
+                          <option value="Processing">
+                            📦 Set to Processing
+                          </option>
                           <option value="Shipped">🚚 Set to Shipped</option>
                           <option value="Delivered">✅ Set to Delivered</option>
                         </select>
@@ -234,6 +282,13 @@ export default function Orders() {
             </table>
           </div>
         </div>
+      )}
+      {/* 🧾 INJECT DETAILS MODAL GATE */}
+      {selectedOrder && (
+        <OrderDetailsModal
+          order={selectedOrder}
+          onClose={() => setSelectedOrder(null)}
+        />
       )}
     </div>
   );

@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useAppStore } from "../store/useAppStore";
 import { Link, useNavigate } from "react-router-dom";
 import { db } from "../firebase/config";
-import { collection, addDoc } from "firebase/firestore";
+import { collection, addDoc, query, where, getDocs } from "firebase/firestore";
 import { initializeRazorpayPayment } from "../services/payment";
 import {
   Trash2,
@@ -12,12 +12,16 @@ import {
   Truck,
   CreditCard,
   ArrowLeft,
+  Ticket,
+  X,
 } from "lucide-react";
 import { toast } from "react-hot-toast";
 
 export default function Cart() {
   const navigate = useNavigate();
   const [checkingOut, setCheckingOut] = useState(false);
+  const [couponInput, setCouponInput] = useState("");
+  const [verifyingCoupon, setVerifyingCoupon] = useState(false);
 
   const user = useAppStore((state) => state.user);
   const cart = useAppStore((state) => state.cart) || [];
@@ -27,8 +31,61 @@ export default function Cart() {
   const clearCart = useAppStore((state) => state.clearCart);
 
   const subtotal = cartTotal();
-  const shippingFee = subtotal > 2000 || subtotal === 0 ? 0 : 150;
-  const grandTotal = subtotal + shippingFee;
+  
+
+  // Coupon Store Actions
+  const appliedCoupon = useAppStore((state) => state.appliedCoupon);
+  const setAppliedCoupon = useAppStore((state) => state.setAppliedCoupon);
+  const clearCoupon = useAppStore((state) => state.clearCoupon);
+
+  // Calculate dynamic promotional discount
+  const discountAmount = appliedCoupon 
+    ? Math.round((subtotal * appliedCoupon.discountPercentage) / 100) 
+    : 0;
+
+  // Shipping logic adjusted on total value after discount
+  const shippingFee = (subtotal - discountAmount) > 2000 || subtotal === 0 ? 0 : 150;
+  const grandTotal = Math.round(subtotal - discountAmount + shippingFee);
+
+  // 🔍 VALIDATE COUPON AGAINST FIRESTORE PROMOTIONAL COLLECTION
+  const handleApplyCoupon = async (e) => {
+    e.preventDefault();
+    if (!couponInput.trim()) return;
+
+    setVerifyingCoupon(true);
+    try {
+      const q = query(
+        collection(db, "coupons"), 
+        where("code", "==", couponInput.trim().toUpperCase())
+      );
+      const querySnapshot = await getDocs(q);
+
+      if (querySnapshot.empty) {
+        toast.error("Invalid coupon code.");
+        return;
+      }
+
+      const couponDoc = querySnapshot.docs[0].data();
+
+      if (!couponDoc.isActive) {
+        toast.error("This coupon code has expired or is disabled.");
+        return;
+      }
+
+      // If valid, save it to store state
+      setAppliedCoupon({
+        code: couponDoc.code,
+        discountPercentage: couponDoc.discountPercentage,
+      });
+      toast.success(`Coupon "${couponDoc.code}" applied! (${couponDoc.discountPercentage}% OFF)`);
+      setCouponInput("");
+    } catch (err) {
+      console.error("Coupon verification failed:", err);
+      toast.error("Error processing coupon data.");
+    } finally {
+      setVerifyingCoupon(false);
+    }
+  };
 
   const handleCheckout = async () => {
     if (cart.length === 0) return;
@@ -64,6 +121,8 @@ export default function Cart() {
               qty: Number(item.qty || 1),
             })),
             subtotal,
+            discountApplied: discountAmount, // 👈 Saved discount balance tracking parameters
+            couponCode: appliedCoupon ? appliedCoupon.code : null, // 👈 Linked code asset
             shippingFee,
             grandTotal,
             paymentStatus: "Paid", // Financial tracking gate flag
@@ -180,18 +239,66 @@ export default function Cart() {
           <div className="bg-white p-6 rounded-xl space-y-4">
             <h2 className="text-xl font-bold">Order Summary</h2>
 
+            {/* 🏷️ COUPON OPERATION INTERACTION UNIT */}
+            {!appliedCoupon ? (
+              <form onSubmit={handleApplyCoupon} className="flex gap-2 pt-1">
+                <div className="relative flex-1">
+                  <Ticket size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-stone-400" />
+                  <input
+                    type="text"
+                    placeholder="PROMO CODE"
+                    value={couponInput}
+                    onChange={(e) => setCouponInput(e.target.value)}
+                    className="w-full pl-9 pr-3 py-2.5 bg-stone-50 border border-stone-200 rounded-xl text-xs font-bold uppercase tracking-wider outline-none focus:border-mango"
+                  />
+                </div>
+                <button
+                  type="submit"
+                  disabled={verifyingCoupon}
+                  className="bg-brown text-white text-xs font-bold px-4 rounded-xl hover:bg-brown/90 transition-all disabled:opacity-50 cursor-pointer"
+                >
+                  {verifyingCoupon ? "Validating..." : "Apply"}
+                </button>
+              </form>
+            ) : (
+              <div className="flex items-center justify-between bg-emerald-50/60 border border-emerald-100 px-3 py-2.5 rounded-xl text-emerald-800 text-xs font-bold">
+                <span className="flex items-center gap-1.5">
+                  <Ticket size={14} /> Code: {appliedCoupon.code} ({appliedCoupon.discountPercentage}% Off)
+                </span>
+                <button 
+                  type="button" 
+                  onClick={clearCoupon} 
+                  title="Remove Coupon"
+                  className="text-emerald-700 hover:text-rose-600 p-0.5 rounded transition-colors cursor-pointer"
+                >
+                  <X size={14} />
+                </button>
+              </div>
+            )}
+
+            <div className="space-y-2 text-sm text-stone-600 font-medium pt-2 border-t border-stone-50">
+
             <div className="flex justify-between">
               <span>Subtotal</span>
               <span>₹{subtotal}</span>
             </div>
 
+            {/* Conditional Discount rendering line */}
+              {discountAmount > 0 && (
+                <div className="flex justify-between text-emerald-600 font-semibold">
+                  <span>Promo Discount</span>
+                  <span>- ₹{discountAmount}</span>
+                </div>
+              )}
+
             <div className="flex justify-between">
               <span>Shipping</span>
               <span>{shippingFee === 0 ? "FREE" : `₹${shippingFee}`}</span>
+              </div>
             </div>
 
             <div className="flex justify-between font-bold text-lg border-t pt-3">
-              <span>Total</span>
+              <span>Total due</span>
               <span>₹{grandTotal}</span>
             </div>
 

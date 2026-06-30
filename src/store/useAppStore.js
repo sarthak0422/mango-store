@@ -106,9 +106,13 @@ export const useAppStore = create((set, get) => ({
   },
 
   // =====================
-  // CART STATE
+  // CART & COUPON STATE
   // =====================
   cart: [],
+  appliedCoupon: null,
+
+  setAppliedCoupon: (coupon) => set({ appliedCoupon: coupon }),
+  clearCoupon: () => set({ appliedCoupon: null }),
 
   addToCart: (product) => {
     const cart = get().cart;
@@ -167,7 +171,7 @@ export const useAppStore = create((set, get) => ({
     }
   },
 
-  clearCart: () => set({ cart: [] }),
+  clearCart: () => set({ cart: [], appliedCoupon: null }),
 
   // =====================
   // CART HELPERS
