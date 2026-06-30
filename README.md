@@ -6,7 +6,7 @@ A modern, full-stack e-commerce web application for premium mango sales built wi
 
 ## 🌐 Live Demo
 
-👉 https://your-live-project-link.vercel.app
+👉 https://mangoostore.vercel.app
 
 ---
 
