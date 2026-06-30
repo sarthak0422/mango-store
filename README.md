@@ -10,24 +10,6 @@ A modern, full-stack e-commerce web application for premium mango sales built wi
 
 ---
 
-## 📸 Preview
-
-> Replace these with actual screenshots from your project
-
-### 🏠 Home Page
-![Home](https://via.placeholder.com/1000x500?text=Mango+Store+Home+Page)
-
-### 🛒 Cart & Checkout
-![Cart](https://via.placeholder.com/1000x500?text=Cart+Checkout+Page)
-
-### 📦 Order Tracking
-![Orders](https://via.placeholder.com/1000x500?text=Order+Tracking+Dashboard)
-
-### 🧑‍💼 Admin Dashboard
-![Admin](https://via.placeholder.com/1000x500?text=Admin+Analytics+Dashboard)
-
----
-
 ## 🚀 Features
 
 ### 🔐 Authentication & User System
