@@ -1,7 +1,7 @@
-import { initializeApp } from 'firebase/app'
-import { getFirestore } from 'firebase/firestore'
-import { getAuth } from 'firebase/auth'
-import { getStorage } from 'firebase/storage'
+import { initializeApp } from "firebase/app";
+import { getFirestore } from "firebase/firestore";
+import { getAuth } from "firebase/auth";
+import { getStorage } from "firebase/storage";
 import { getFunctions, connectFunctionsEmulator } from "firebase/functions";
 
 const firebaseConfig = {
@@ -16,18 +16,27 @@ const firebaseConfig = {
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 
-// Initialize Functions
-const functions = getFunctions(app);
+// 🌍 If your backend functions are deployed in Mumbai/India region:
+export const functions = getFunctions(app, "asia-south1");
 
 // 👇 ADD THIS EXACT PIECE OF CODE HERE 👇
 // It checks if you are running on localhost. If yes, it redirects to your local machine.
-if (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1") {
-  console.log("👉 Connecting frontend to local Firebase Emulators...");
+
+// if (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1") {
+//   console.log("👉 Connecting frontend to local Firebase Emulators...");
+//   connectFunctionsEmulator(functions, "127.0.0.1", 5001);
+// }
+
+if (import.meta.env.DEV) {
+  console.log("Using Firebase Functions Emulator");
+
   connectFunctionsEmulator(functions, "127.0.0.1", 5001);
+} else {
+  console.log("Using deployed Firebase Cloud Functions");
 }
 
-export { app, functions };
+export { app };
 
-export const db = getFirestore(app)
-export const auth = getAuth(app)
-export const storage = getStorage(app)
+export const db = getFirestore(app);
+export const auth = getAuth(app);
+export const storage = getStorage(app);

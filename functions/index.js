@@ -10,6 +10,7 @@
 const { onCall, HttpsError } = require("firebase-functions/v2/https");
 const { setGlobalOptions } = require("firebase-functions/v2");
 const logger = require("firebase-functions/logger");
+const functions = require("firebase-functions");
 const Razorpay = require("razorpay");
 
 // For cost control, you can set the maximum number of containers that can be
@@ -34,7 +35,8 @@ setGlobalOptions({ maxInstances: 10 });
 
 
 exports.createRazorpayOrder = onCall({
-  cors: ["http://localhost:5173", "https://mango-store-176aa.web.app"],
+  region : "asia-south1",
+  cors: ["http://localhost:5173", "http://localhost:8080", "https://mango-store-176aa.web.app"],
   maxInstances: 10
 }, async (request) => {
   // 1. Auth check
