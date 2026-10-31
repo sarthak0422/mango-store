@@ -1,45 +1,37 @@
-🥭 Mango Store
-Premium E-Commerce Platform
+why this readme is not looking good in github make it 🥭 Mango Store — Premium E-Commerce Platform
 
-A modern, full-stack e-commerce platform built for premium mango sales, featuring secure authentication, dynamic shopping cart management, promotional coupons, Razorpay payments, order tracking, and a comprehensive admin dashboard.
+A modern, full-stack e-commerce application for premium mango sales, built with React, Zustand, Firebase, Docker, and Razorpay.
 
-<p align="center">
-<a href="https://mangoostore.vercel.app/">
-<img src="https://img.shields.io/badge/Live%20Demo-Visit%20Store-16A34A?style=for-the-badge&logo=vercel&logoColor=white" alt="Live Demo" />
-</a>
-</p>
+Mango Store provides a complete shopping experience with secure authentication, dynamic cart management, promotional coupons, payment processing, order tracking, and an administrative dashboard.
 
-<p align="center">
-Built with React • Firebase • Zustand • Docker • Razorpay
-</p>
+🌐 Live Demo
+
+👉 https://mangoostore.vercel.app/
 
 🚀 Features
 🔐 Authentication & User Management
-Secure authentication using Firebase Authentication.
+Firebase Authentication for secure login and signup.
 User profile management.
 Role-based access support (User / Admin).
 Protected routes and account management.
 🛒 Shopping Experience
 Dynamic product browsing.
-Global state management with Zustand.
-Interactive shopping cart with quantity management.
-Promotional coupons and discount system.
+Zustand-powered global state management.
+Shopping cart with quantity management.
+Coupon and promotional discount system.
 Automatic shipping fee calculations.
-Dynamic order summaries.
-💳 Payment Integration
+Dynamic order summary.
+💳 Payment & Financial Transaction Infrastructure
 Razorpay Checkout integration.
 Backend-driven Razorpay order creation.
 Payment success and failure handling.
-Secure payment signature verification.
 Payment status tracking.
+Secure payment signature verification.
 Firestore order persistence.
-📦 Order Management
+📦 Order Management & Tracking
 Individual customer order history.
 Detailed invoice modal.
-Order fulfillment workflow:
-
-Pending → Processing → Shipped → Delivered
-
+Order fulfillment workflow: Pending → Processing → Shipped → Delivered
 Payment and fulfillment status tracking.
 🧑‍💼 Admin Dashboard
 Revenue analytics.
@@ -52,11 +44,11 @@ Customer feedback management.
 Public customer review submission.
 Admin approval and deletion.
 Real-time Firestore synchronization using onSnapshot.
-🧰 Tech Stack
-Category	Technologies
+🧰 Technology Stack
+Category	Technology
 Frontend	React.js, Vite
 Routing	React Router DOM
-State Management	Zustand
+State Orchestration	Zustand
 Backend Services	Firebase
 Authentication	Firebase Authentication
 Database	Cloud Firestore
@@ -68,43 +60,33 @@ Containerization	Docker
 Container Orchestration	Docker Compose
 Web Server	Nginx
 Cloud Deployment	Google Cloud Run
-Local Development	Firebase Emulator Suite
+Local Backend Development	Firebase Emulator Suite
 🏗️ Application Architecture
 text
-                    MANGO STORE
-                         |
-          +--------------+--------------+
-          |              |              |
-     React Frontend  Firebase       Deployment
-          |          Services      Infrastructure
-          |              |              |
-      React UI       Authentication    Docker
-      Zustand        Firestore         Docker Compose
-      React Router   Cloud Functions   Nginx
-      Payment        Razorpay API      Artifact Registry
-      Service                          Cloud Run
-
-Payment Workflow
-text
-Customer
-   |
-   v
-React Frontend
-   |
-   v
-Firebase Cloud Function
-   |
-   v
-Razorpay Order Creation
-   |
-   v
-Razorpay Checkout
-   |
-   v
-Payment Verification
-   |
-   v
-Firestore Order Persistence
+MANGO STORE
+│
+├── React Frontend
+│   ├── Pages
+│   ├── Components
+│   ├── Zustand Store
+│   ├── React Router
+│   └── Payment Service
+│
+├── Firebase Services
+│   ├── Authentication
+│   ├── Cloud Firestore
+│   └── Cloud Functions
+│       └── Razorpay Order Creation
+│
+├── Payment Infrastructure
+│   └── Razorpay Checkout
+│
+└── Deployment Infrastructure
+    ├── Docker
+    ├── Docker Compose
+    ├── Nginx
+    ├── Artifact Registry
+    └── Google Cloud Run
 
 📁 Project Structure
 text
@@ -152,6 +134,7 @@ mango-store/
 ├── nginx.conf
 ├── firebase.json
 ├── firestore.rules
+├── .env
 ├── .env.example
 ├── package.json
 └── README.md
@@ -165,36 +148,34 @@ cd mango-store
 
 2. Install Dependencies
 
-Install dependencies using the lockfile:
+For a reproducible installation using the lockfile:
 
 bash
 npm ci
 
-3. Start Development Server
+
+For development:
+
 bash
 npm run dev
 
 
-Open your browser:
+The Vite development server typically runs at:
 
 text
 http://localhost:5173
 
-🔥 Firebase Configuration
+🔥 3. Firebase Configuration
 
-Create a Firebase project and enable:
+Create a Firebase project and configure Firebase Authentication and Cloud Firestore.
 
-Firebase Authentication
-Cloud Firestore
-Cloud Functions
-
-Configure your Firebase credentials in:
+Update:
 
 text
 src/firebase/config.js
 
 
-Example configuration:
+Example:
 
 javascript
 import { initializeApp } from "firebase/app";
@@ -220,7 +201,7 @@ export const functions = getFunctions(app, "asia-south1");
 
 Firebase Emulator Configuration
 
-For local Cloud Functions development:
+For local Cloud Functions development, connect the frontend to the emulator:
 
 javascript
 import { connectFunctionsEmulator } from "firebase/functions";
@@ -235,24 +216,39 @@ Start the Firebase Emulator Suite:
 bash
 firebase emulators:start
 
-Service	Local URL
-Functions Emulator	http://127.0.0.1:5001
-Emulator UI	http://127.0.0.1:4000
-Note: The Functions Emulator does not automatically emulate Authentication or Firestore. Configure those emulators separately when required.
-💳 Razorpay Configuration
+
+Functions Emulator:
+
+text
+http://127.0.0.1:5001
+
+
+Emulator UI:
+
+text
+http://127.0.0.1:4000
+
+
+Important: The Functions Emulator does not automatically emulate Authentication or Firestore. Configure those emulators separately when local development requires them.
+
+💳 4. Razorpay Configuration
 
 Create a Razorpay account and obtain your API credentials.
 
-Frontend Environment Variables
+Configure the frontend environment:
+
 env
 VITE_RAZORPAY_KEY_ID=your_razorpay_key_id
 
-Backend Environment Variables
+
+Configure backend secrets separately:
+
 env
 RAZORPAY_KEY_ID=your_razorpay_key_id
 RAZORPAY_KEY_SECRET=your_razorpay_key_secret
 
-Payment Security
+
+Never expose RAZORPAY_KEY_SECRET in frontend code or Docker frontend environment variables.
 
 The backend is responsible for:
 
@@ -260,30 +256,37 @@ Creating Razorpay orders.
 Validating payment amounts.
 Verifying payment signatures.
 Confirming payment status before fulfilling orders.
-Important: Never expose RAZORPAY_KEY_SECRET in frontend code or client-side environment variables.
-🐳 Docker & Nginx Deployment
+🐳 Docker & Nginx Deployment Workflow
 
 Mango Store uses Docker to containerize the React application and Nginx to serve the optimized production build.
 
-1. Build the React Application
+5. Prepare the React Application
+
+Install dependencies:
+
 bash
 npm ci
+
+
+Generate the optimized production build:
+
+bash
 npm run build
 
 
-Production assets are generated inside:
+The production assets are generated inside:
 
 text
 dist/
 
-2. Docker Configuration
+6. Configure Docker
 
 The project includes:
 
 File	Responsibility
+.dockerignore	Excludes unnecessary files from Docker build context
 Dockerfile	Creates the production image
-Dockerfile.dev	Development container configuration
-.dockerignore	Excludes unnecessary build context files
+Dockerfile.dev	Supports development container configuration
 
 Example .dockerignore:
 
@@ -295,10 +298,14 @@ dist
 .env.*
 npm-debug.log
 
-Ensure required build-time configuration is supplied securely when environment files are excluded from the Docker build context.
-3. Nginx Configuration
 
-The nginx.conf file serves the React production build and supports client-side routing.
+Only exclude environment files if their required build values are supplied securely through the build configuration.
+
+7. Configure Nginx
+
+The nginx.conf file configures Nginx to serve the React production build.
+
+It also supports React Router client-side navigation through SPA fallback routing.
 
 Example:
 
@@ -320,9 +327,11 @@ server {
     }
 }
 
-4. Docker Compose Configuration
+8. Configure Docker Compose
 
-Example docker-compose.yml:
+The docker-compose.yml file manages the application container, build configuration, and port mapping.
+
+Example:
 
 yaml
 services:
@@ -335,9 +344,11 @@ services:
       - "8080:80"
     restart: unless-stopped
 
-5. Environment Variables
+9. Configure Environment Variables & Security Rules
 
-Create a .env file using .env.example as a reference.
+Create .env using .env.example as a reference.
+
+Frontend variables must use the Vite prefix:
 
 env
 VITE_FIREBASE_API_KEY=
@@ -348,9 +359,18 @@ VITE_FIREBASE_MESSAGING_SENDER_ID=
 VITE_FIREBASE_APP_ID=
 VITE_RAZORPAY_KEY_ID=
 
-6. Build and Run
 
-Build and start the production container:
+Security considerations:
+
+Never commit .env files containing secrets.
+Keep Razorpay secret credentials on the backend.
+Configure Firestore Security Rules to restrict unauthorized reads and writes.
+Validate user ownership of orders.
+Restrict administrative operations using trusted authorization checks.
+Verify Razorpay payment signatures on the backend.
+10. Build and Run Production Container
+
+Build and start the production application:
 
 bash
 docker compose up --build web
@@ -362,107 +382,112 @@ bash
 docker compose up --build -d web
 
 
-Useful Docker commands:
+Check running containers:
 
 bash
-# Check running containers
 docker compose ps
 
-# View application logs
+
+View logs:
+
+bash
 docker compose logs -f web
 
-# Stop containers
+
+Stop containers:
+
+bash
 docker compose down
 
-
-Access the application:
-
+Access the Application
 text
 http://localhost:8080
 
-☁️ Google Cloud Run Deployment
+<!-- ☁️ 11. Deploy to Google Cloud Run
 
 Google Cloud Run provides managed container hosting for the production application.
 
-1. Configure Google Cloud CLI
+Step 1: Configure Google Cloud CLI
+
+Install and initialize the Google Cloud CLI.
+
 bash
 gcloud init
 
+
+Select your Google Cloud project:
+
+bash
 gcloud config set project YOUR_PROJECT_ID
 
-2. Enable Required APIs
+Step 2: Enable Required APIs
 bash
 gcloud services enable \
   run.googleapis.com \
   artifactregistry.googleapis.com \
   cloudbuild.googleapis.com
 
-3. Create Artifact Registry Repository
+Step 3: Create an Artifact Registry Repository
 bash
 gcloud artifacts repositories create mango-store \
   --repository-format=docker \
   --location=asia-south1 \
   --description="Mango Store production images"
 
-4. Configure Docker Authentication
+Step 4: Configure Docker Authentication
 bash
 gcloud auth configure-docker asia-south1-docker.pkg.dev
 
-5. Build and Tag Production Image
+Step 5: Build Production Image
 bash
 docker build -t mango-store .
 
+Step 6: Tag the Image
+bash
 docker tag mango-store:latest \
   asia-south1-docker.pkg.dev/YOUR_PROJECT_ID/mango-store/mango-store:latest
 
-6. Push Image to Artifact Registry
+Step 7: Push Image to Artifact Registry
 bash
 docker push \
   asia-south1-docker.pkg.dev/YOUR_PROJECT_ID/mango-store/mango-store:latest
 
-7. Deploy to Cloud Run
+Step 8: Deploy to Cloud Run
 bash
 gcloud run deploy mango-store \
   --image asia-south1-docker.pkg.dev/YOUR_PROJECT_ID/mango-store/mango-store:latest \
   --region asia-south1 \
   --platform managed \
-  --allow-unauthenticated
+  --allow-unauthenticated -->
 
 
 After deployment, Google Cloud Run provides a public HTTPS URL.
 
-Note: Google Cloud Run and Firebase Cloud Functions deployments may require an eligible Google Cloud billing account. Additional usage can incur charges.
+Important: Cloud Run requires a Google Cloud billing account even though it offers a free usage allowance. Usage beyond the allowance can incur charges. Firebase Cloud Functions also requires an eligible billing account for deployment.
+
 🧪 Development vs Production
 Environment	Frontend	Backend
-Local Development	Vite (5173)	Firebase Emulators
-Docker Production Test	Nginx (8080)	Deployed Backend
-Cloud Deployment	Cloud Run	Deployed Backend
+Local development	Vite (5173)	Firebase Emulators (5001)
+Docker production test	Nginx (8080)	Deployed backend
+Cloud deployment	Cloud Run	Deployed backend
 
 Always ensure the frontend connects to the correct backend environment.
 
-🔒 Security Best Practices
+🔒 Security & Best Practices
 Use environment variables for application configuration.
 Never expose private payment credentials.
 Verify Razorpay payment signatures on the backend.
 Implement Firebase Authentication checks.
 Enforce Firestore Security Rules.
-Validate payment amounts server-side.
-Never mark an order as paid based only on frontend callbacks.
-Validate user ownership of orders.
-Restrict administrative operations using trusted authorization checks.
+Validate all payment amounts server-side.
+Do not mark an order as paid based only on frontend callbacks.
 Use HTTPS for production deployment.
 📄 License
 
-This project is licensed under the MIT License.
-
-Copyright © 2026
+MIT License © 2026
 
 👨‍💻 Author
 
-Sarthak
-
 Developed as a full-stack e-commerce portfolio project using modern frontend technologies, Firebase services, payment integration, and containerized deployment.
 
-<p align="center">
-<b>🥭 Mango Store — Bringing Premium Mangoes to Your Doorstep!</b>
-</p>
+Mango Store — Bringing Premium Mangoes to Your Doorstep! 🥭
